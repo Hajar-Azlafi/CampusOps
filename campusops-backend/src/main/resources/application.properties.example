@@ -5,18 +5,21 @@ server.port=8080
 # PostgreSQL
 spring.datasource.url=jdbc:postgresql://localhost:5434/campusops_db
 spring.datasource.username=postgres
-spring.datasource.password=1111
+spring.datasource.password=CHANGE_MOI
 spring.datasource.driver-class-name=org.postgresql.Driver
 
 # JPA / Hibernate
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.format_sql=true
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
 
-# JWT (valeurs temporaires, on les utilisera a l'etape Securite)
-application.security.jwt.secret-key=HbjE5pQdHJnNb44233n8nP/rUweJtioUC8x7KqEU5JTOJ2DNUJsIUZ3SfeH0pIG6Y7va1N2uUqiIqXcu6esBhg==
+# JWT
+application.security.jwt.secret-key=CHANGE_MOI_CLE_BASE64_256_BITS_MINIMUM
 application.security.jwt.expiration=86400000
 
 # Encodage
 spring.datasource.hikari.connection-init-sql=SET client_encoding TO 'UTF8'
+
+# Admin par defaut
+application.security.admin.email=admin@campusops.ma
+application.security.admin.default-password=CHANGE_MOI
