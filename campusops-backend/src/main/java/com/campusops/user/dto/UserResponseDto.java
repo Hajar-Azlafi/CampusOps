@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 
 @Getter
 @Setter
@@ -23,6 +25,8 @@ public class UserResponseDto {
     private Role role;
     private String department;
     private String phoneNumber;
+
+    @JsonProperty("isActive")
     private boolean isActive;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
