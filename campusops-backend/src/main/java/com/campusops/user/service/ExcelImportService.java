@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -88,6 +87,7 @@ public class ExcelImportService {
                             .department(department.isBlank() ? null : department.trim())
                             .phoneNumber(phoneNumber.isBlank() ? null : phoneNumber.trim())
                             .isActive(true)
+                            .mustChangePassword(true)
                             .build();
 
                     userRepository.save(user);
@@ -207,5 +207,20 @@ public class ExcelImportService {
         } catch (IOException e) {
             throw new BadRequestException("Erreur lors de la generation du modele Excel");
         }
+    }
+
+    public byte[] generateCsvReport(ImportResultDto result) {
+        StringBuilder csv = new StringBuilder();
+        csv.append('\uFEFF');
+        csv.append("Email;Mot de passe temporaire\n");
+
+        for (CreatedAccountDto account : result.getCreatedAccounts()) {
+            csv.append(account.getEmail())
+                    .append(';')
+                    .append(account.getTemporaryPassword())
+                    .append('\n');
+        }
+
+        return csv.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8);
     }
 }

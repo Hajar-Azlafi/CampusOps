@@ -77,8 +77,21 @@ public class UserController {
     }
 
     @PostMapping(value = "/import", consumes = "multipart/form-data")
-    public ResponseEntity<ImportResultDto> importUsers(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<?> importUsers(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(required = false, defaultValue = "json") String format
+    ) {
         ImportResultDto result = excelImportService.importUsers(file);
+
+        if ("csv".equalsIgnoreCase(format)) {
+            byte[] csv = excelImportService.generateCsvReport(result);
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType("text/csv"))
+                    .header(HttpHeaders.CONTENT_DISPOSITION,
+                            "attachment; filename=rapport_import.csv")
+                    .body(csv);
+        }
+
         return ResponseEntity.ok(result);
     }
 

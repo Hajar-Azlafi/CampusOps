@@ -37,6 +37,7 @@ public class UserService {
         String temporaryPassword = passwordGenerator.generate();
         user.setPassword(passwordEncoder.encode(temporaryPassword));
         user.setActive(true);
+        user.setMustChangePassword(true);
 
         User savedUser = userRepository.save(user);
         return userMapper.toResponseDto(savedUser);
@@ -120,6 +121,7 @@ public class UserService {
         User user = findUserOrThrow(id);
         String newTemporaryPassword = passwordGenerator.generate();
         user.setPassword(passwordEncoder.encode(newTemporaryPassword));
+        user.setMustChangePassword(true);
         userRepository.save(user);
 
         return PasswordResetResponseDto.builder()

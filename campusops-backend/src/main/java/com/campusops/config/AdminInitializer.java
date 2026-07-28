@@ -38,6 +38,7 @@ public class AdminInitializer implements CommandLineRunner {
                 .password(passwordEncoder.encode(adminDefaultPassword))
                 .role(Role.ADMIN)
                 .isActive(true)
+                .mustChangePassword(false)
                 .build();
 
         userRepository.save(admin);
