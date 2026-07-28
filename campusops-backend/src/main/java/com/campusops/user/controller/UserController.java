@@ -1,16 +1,17 @@
 package com.campusops.user.controller;
 
 import com.campusops.enums.Role;
-import com.campusops.user.dto.ChangeRoleRequestDto;
-import com.campusops.user.dto.PasswordResetResponseDto;
-import com.campusops.user.dto.UserRequestDto;
-import com.campusops.user.dto.UserResponseDto;
+import com.campusops.user.dto.*;
+import com.campusops.user.service.ExcelImportService;
 import com.campusops.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -20,6 +21,7 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final ExcelImportService excelImportService;
 
     @PostMapping
     public ResponseEntity<UserResponseDto> createUser(@Valid @RequestBody UserRequestDto request) {
@@ -72,5 +74,23 @@ public class UserController {
     @PostMapping("/{id}/reset-password")
     public ResponseEntity<PasswordResetResponseDto> resetPassword(@PathVariable Long id) {
         return ResponseEntity.ok(userService.resetPassword(id));
+    }
+
+    @PostMapping(value = "/import", consumes = "multipart/form-data")
+    public ResponseEntity<ImportResultDto> importUsers(@RequestParam("file") MultipartFile file) {
+        ImportResultDto result = excelImportService.importUsers(file);
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/import/template")
+    public ResponseEntity<byte[]> downloadTemplate() {
+        byte[] template = excelImportService.generateTemplate();
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=modele_import_utilisateurs.xlsx")
+                .body(template);
     }
 }
