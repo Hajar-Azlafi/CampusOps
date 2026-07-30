@@ -4,6 +4,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 import MainLayout from './components/layout/MainLayout'
 import LoginPage from './pages/LoginPage'
 import ChangePasswordPage from './pages/ChangePasswordPage'
+import UsersPage from './pages/UsersPage'
 
 
 function Placeholder({ title }) {
@@ -26,7 +27,7 @@ function App() {
             }
           >
             <Route path="/dashboard" element={<Placeholder title="Tableau de bord (a construire)" />} />
-            <Route path="/users" element={<Placeholder title="Utilisateurs (a construire)" />} />
+            <Route path="/users" element={<UsersPage />} />
             <Route path="/change-password" element={<ChangePasswordPage />} />
           </Route>
         </Routes>

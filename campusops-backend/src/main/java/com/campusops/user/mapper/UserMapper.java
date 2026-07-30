@@ -18,5 +18,6 @@ public interface UserMapper {
     User toEntity(UserRequestDto dto);
 
     @Mapping(target = "isActive", source = "active")
+    @Mapping(target = "temporaryPassword", ignore = true)
     UserResponseDto toResponseDto(User user);
 }

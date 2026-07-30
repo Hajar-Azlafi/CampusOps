@@ -40,7 +40,9 @@ public class UserService {
         user.setMustChangePassword(true);
 
         User savedUser = userRepository.save(user);
-        return userMapper.toResponseDto(savedUser);
+        UserResponseDto response = userMapper.toResponseDto(savedUser);
+        response.setTemporaryPassword(temporaryPassword);
+        return response;
     }
 
     @Transactional(readOnly = true)
