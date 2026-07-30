@@ -6,6 +6,8 @@ import UserFormModal from '../components/UserFormModal'
 import ConfirmDialog from '../components/ConfirmDialog'
 import TempPasswordModal from '../components/TempPasswordModal'
 import UserRowActions from '../components/UserRowActions'
+import { Link } from 'react-router-dom'
+
 
 export default function UsersPage() {
   const [users, setUsers] = useState([])
@@ -128,12 +130,20 @@ export default function UsersPage() {
           <h1 className="font-display text-2xl font-semibold text-ink">Utilisateurs</h1>
           <p className="text-sm text-ink/50 mt-1">{users.length} compte(s)</p>
         </div>
-        <button
-          onClick={openCreate}
-          className="px-4 py-2.5 bg-blueprint-800 hover:bg-blueprint-700 text-white text-sm font-medium rounded-lg transition-colors"
-        >
-          + Nouvel utilisateur
-        </button>
+        <div className="flex gap-3">
+         <Link
+    to="/users/import"
+    className="px-4 py-2.5 border border-blueprint-800/25 text-blueprint-800 text-sm font-medium rounded-lg hover:bg-blueprint-800/5 transition-colors"
+  >
+    Importer depuis Excel
+  </Link>
+  <button
+    onClick={openCreate}
+    className="px-4 py-2.5 bg-blueprint-800 hover:bg-blueprint-700 text-white text-sm font-medium rounded-lg transition-colors"
+  >
+    + Nouvel utilisateur
+  </button>
+</div>
       </div>
 
       <div className="bg-white border border-ink/10 rounded-xl p-4 mb-4 flex flex-col md:flex-row gap-3">

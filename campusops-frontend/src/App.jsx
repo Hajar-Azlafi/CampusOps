@@ -5,6 +5,8 @@ import MainLayout from './components/layout/MainLayout'
 import LoginPage from './pages/LoginPage'
 import ChangePasswordPage from './pages/ChangePasswordPage'
 import UsersPage from './pages/UsersPage'
+import ImportUsersPage from './pages/ImportUsersPage'
+import DashboardPage from './pages/DashboardPage'
 
 
 function Placeholder({ title }) {
@@ -26,9 +28,10 @@ function App() {
               </ProtectedRoute>
             }
           >
-            <Route path="/dashboard" element={<Placeholder title="Tableau de bord (a construire)" />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/users" element={<UsersPage />} />
             <Route path="/change-password" element={<ChangePasswordPage />} />
+            <Route path="/users/import" element={<ImportUsersPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

@@ -34,3 +34,14 @@ export function reactivateUser(id) {
 export function resetUserPassword(id) {
   return axiosClient.post(`/users/${id}/reset-password`).then((res) => res.data)
 }
+export function downloadImportTemplate() {
+  return axiosClient.get('/users/import/template', { responseType: 'blob' })
+}
+
+export function importUsersFile(file) {
+  const formData = new FormData()
+  formData.append('file', file)
+  return axiosClient
+    .post('/users/import', formData, { headers: { 'Content-Type': undefined } })
+    .then((res) => res.data)
+}

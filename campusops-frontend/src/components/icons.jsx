@@ -15,6 +15,7 @@ export function IconUsers(props) {
       <path strokeLinecap="round" strokeLinejoin="round" d="M15.5 13.3c2 .3 3.6 1.9 4 4.2" />
     </svg>
   )
+  
 }
 
 export function IconMenu(props) {
@@ -88,6 +89,47 @@ export function IconArrowRight(props) {
   return (
     <svg viewBox="0 0 24 24" fill="none" strokeWidth="2" stroke="currentColor" {...props}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M13 6l6 6-6 6" />
+    </svg>
+  )
+}
+export function IconUpload(props) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" strokeWidth="1.8" stroke="currentColor" {...props}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 16V4M7 9l5-5 5 5M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3" />
+    </svg>
+  )
+}
+
+export function IconFileSpreadsheet(props) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" strokeWidth="1.8" stroke="currentColor" {...props}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M14 2H6a1 1 0 00-1 1v18a1 1 0 001 1h12a1 1 0 001-1V7l-5-5z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M14 2v5h5M8 13h8M8 17h8M8 13v4M12 13v4M16 13v4" />
+    </svg>
+  )
+}
+
+export function IconDownload(props) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" strokeWidth="1.8" stroke="currentColor" {...props}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v12M7 11l5 5 5-5M4 20h16" />
+    </svg>
+  )
+}
+
+export function IconCheckCircle(props) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" strokeWidth="1.8" stroke="currentColor" {...props}>
+      <circle cx="12" cy="12" r="9" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M8.5 12.5l2.5 2.5 4.5-5" />
+    </svg>
+  )
+}
+
+export function IconAlertTriangle(props) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" strokeWidth="1.8" stroke="currentColor" {...props}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 3l10 18H2L12 3zM12 10v4M12 17.5v.01" />
     </svg>
   )
 }
