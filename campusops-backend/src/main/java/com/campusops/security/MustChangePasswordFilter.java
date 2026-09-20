@@ -20,7 +20,13 @@ public class MustChangePasswordFilter extends OncePerRequestFilter {
 
     private static final List<String> ALLOWED_PATHS = List.of(
             "/api/auth/login",
-            "/api/auth/change-password"
+            "/api/auth/change-password",
+            // Identite visuelle seule (Module 11) : l'ecran de changement de mot de
+            // passe obligatoire doit pouvoir afficher le logo et les couleurs de
+            // l'universite. Ces trois GET n'exposent aucune donnee metier.
+            "/api/settings/branding",
+            "/api/settings/logo",
+            "/api/settings/favicon"
     );
 
     @Override

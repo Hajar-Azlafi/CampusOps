@@ -13,11 +13,15 @@ public interface UserMapper {
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "isActive", ignore = true)
     @Mapping(target = "mustChangePassword", ignore = true)
+    @Mapping(target = "failedLoginAttempts", ignore = true)
+    @Mapping(target = "lockedUntil", ignore = true)
+    @Mapping(target = "passwordChangedAt", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     User toEntity(UserRequestDto dto);
 
     @Mapping(target = "isActive", source = "active")
+    @Mapping(target = "emailSent", ignore = true)
     @Mapping(target = "temporaryPassword", ignore = true)
     UserResponseDto toResponseDto(User user);
 }

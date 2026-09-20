@@ -17,14 +17,14 @@ import lombok.Setter;
 @Builder
 public class UserRequestDto {
 
-    @NotBlank(message = "Le prenom est obligatoire")
+    @NotBlank(message = "Le prénom est obligatoire")
     private String firstName;
 
     @NotBlank(message = "Le nom est obligatoire")
     private String lastName;
 
     @NotBlank(message = "L'email est obligatoire")
-    @Email(message = "L'adresse e-mail doit etre valide")
+    @Email(message = "L'adresse e-mail doit être valide")
     private String email;
 
     @NotNull(message = "Le role est obligatoire")

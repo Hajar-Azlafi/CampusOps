@@ -23,7 +23,7 @@ export default function ImportUsersPage() {
     const isExcel =
       selected.name.endsWith('.xlsx') || selected.name.endsWith('.xls')
     if (!isExcel) {
-      setError('Veuillez selectionner un fichier Excel (.xlsx)')
+      setError('Veuillez sélectionner un fichier Excel (.xlsx)')
       return
     }
     setError('')
@@ -75,27 +75,27 @@ export default function ImportUsersPage() {
         Importer des utilisateurs
       </h1>
       <p className="text-sm text-ink/60 mb-8">
-        Ajoutez plusieurs comptes en une seule fois a partir d'un fichier Excel.
+        Ajoutez plusieurs comptes en une seule fois à partir d'un fichier Excel.
       </p>
 
       {!result && (
         <>
-          <div className="bg-white border border-ink/10 rounded-xl p-5 mb-4 flex items-center justify-between">
+          <div className="bg-surface border border-ink/10 rounded-xl p-5 mb-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <IconFileSpreadsheet className="w-8 h-8 text-blueprint-800/70 shrink-0" />
+              <IconFileSpreadsheet className="w-8 h-8 text-heading/70 shrink-0" />
               <div>
-                <p className="text-sm font-medium text-ink">Modele Excel</p>
+                <p className="text-sm font-medium text-ink">Modèle Excel</p>
                 <p className="text-xs text-ink/50">
-                  Telechargez le modele avec les colonnes attendues
+                  Téléchargez le modèle avec les colonnes attendues
                 </p>
               </div>
             </div>
             <button
               onClick={handleDownloadTemplate}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-blueprint-800 border border-blueprint-800/25 rounded-lg hover:bg-blueprint-800/5 transition-colors shrink-0"
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-heading border border-heading/25 rounded-lg hover:bg-heading/5 transition-colors shrink-0"
             >
               <IconDownload className="w-4 h-4" />
-              Telecharger
+              Télécharger
             </button>
           </div>
 
@@ -104,7 +104,7 @@ export default function ImportUsersPage() {
             onDragLeave={() => setDragActive(false)}
             onDrop={handleDrop}
             className={`border-2 border-dashed rounded-xl p-10 text-center transition-colors ${
-              dragActive ? 'border-signal bg-signal/5' : 'border-ink/15 bg-white'
+              dragActive ? 'border-signal bg-signal/5' : 'border-ink/15 bg-surface'
             }`}
           >
             <input
@@ -119,7 +119,7 @@ export default function ImportUsersPage() {
               <>
                 <IconUpload className="w-8 h-8 text-ink/30 mx-auto mb-3" />
                 <p className="text-sm text-ink/60 mb-3">
-                  Glissez-deposez votre fichier ici, ou
+                  Glissez-déposez votre fichier ici, ou
                 </p>
                 <button
                   onClick={() => inputRef.current?.click()}
@@ -127,7 +127,7 @@ export default function ImportUsersPage() {
                 >
                   Choisir un fichier
                 </button>
-                <p className="text-xs text-ink/40 mt-3">Format accepte : .xlsx</p>
+                <p className="text-xs text-ink/40 mt-3">Format accepté : .xlsx</p>
               </>
             ) : (
               <>
@@ -166,7 +166,7 @@ export default function ImportUsersPage() {
       {result && (
         <div>
           <div className="grid grid-cols-3 gap-4 mb-6">
-            <div className="bg-white border border-ink/10 rounded-xl p-4">
+            <div className="bg-surface border border-ink/10 rounded-xl p-4">
               <p className="text-2xl font-display font-semibold text-ink">{result.totalRows}</p>
               <p className="text-xs text-ink/50 mt-1">Lignes traitees</p>
             </div>
@@ -181,15 +181,15 @@ export default function ImportUsersPage() {
           </div>
 
           {result.createdAccounts?.length > 0 && (
-            <div className="bg-white border border-ink/10 rounded-xl overflow-hidden mb-6">
+            <div className="bg-surface border border-ink/10 rounded-xl overflow-hidden mb-6">
               <div className="flex items-center justify-between px-5 py-3 border-b border-ink/10 bg-ink/[0.02]">
                 <div className="flex items-center gap-2">
                   <IconCheckCircle className="w-4 h-4 text-emerald-600" />
-                  <p className="text-sm font-medium text-ink">Comptes crees avec succes</p>
+                  <p className="text-sm font-medium text-ink">Comptes créés avec succès</p>
                 </div>
                 <button
                   onClick={() => downloadCsvFromAccounts(result.createdAccounts)}
-                  className="flex items-center gap-1.5 text-xs font-medium text-blueprint-800 hover:underline"
+                  className="flex items-center gap-1.5 text-xs font-medium text-heading hover:underline"
                 >
                   <IconDownload className="w-3.5 h-3.5" />
                   Exporter en CSV
@@ -215,7 +215,7 @@ export default function ImportUsersPage() {
           )}
 
           {result.errors?.length > 0 && (
-            <div className="bg-white border border-ink/10 rounded-xl overflow-hidden mb-6">
+            <div className="bg-surface border border-ink/10 rounded-xl overflow-hidden mb-6">
               <div className="flex items-center gap-2 px-5 py-3 border-b border-ink/10 bg-ink/[0.02]">
                 <IconAlertTriangle className="w-4 h-4 text-red-600" />
                 <p className="text-sm font-medium text-ink">Lignes en erreur</p>

@@ -32,3 +32,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Secrets locaux (identifiants SMTP...) ###
+# Le modele « secrets.properties.example » reste versionne, pas le fichier reel.
+secrets.properties

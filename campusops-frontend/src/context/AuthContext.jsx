@@ -32,6 +32,14 @@ export function AuthProvider({ children }) {
   }
 
   const logout = () => {
+    // Trace la deconnexion cote serveur sans bloquer la sortie de l'utilisateur.
+    // Le jeton est capture avant le nettoyage du stockage.
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token')
+    if (token) {
+      axiosClient
+        .post('/auth/logout', null, { headers: { Authorization: `Bearer ${token}` } })
+        .catch(() => {})
+    }
     localStorage.removeItem('token')
     localStorage.removeItem('user')
     sessionStorage.removeItem('token')

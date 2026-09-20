@@ -16,7 +16,16 @@ axiosClient.interceptors.request.use((config) => {
 axiosClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const status = error.response?.status
+    const requestUrl = error.config?.url ?? ''
+    // Un 401 sur la tentative de connexion elle-même doit être géré par la page
+    // de connexion (message d'erreur), pas déclencher une redirection/rechargement
+    // qui effacerait le message affiché à l'utilisateur.
+    const isLoginRequest = requestUrl.includes('/auth/login')
+    const alreadyOnLogin =
+      typeof window !== 'undefined' && window.location.pathname === '/login'
+
+    if (status === 401 && !isLoginRequest && !alreadyOnLogin) {
       localStorage.removeItem('token')
       localStorage.removeItem('user')
       sessionStorage.removeItem('token')

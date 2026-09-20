@@ -1,6 +1,8 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { homeRouteForRole } from '../constants/roles'
+import AuthShell from '../components/layout/AuthShell'
 
 function IconMail(props) {
   return (
@@ -40,48 +42,21 @@ function IconArrowRight(props) {
   )
 }
 
-function BlueprintFloorplan() {
-  return (
-    <svg viewBox="0 0 420 260" className="w-full max-w-sm" aria-hidden="true">
-      <rect x="30" y="20" width="360" height="200" rx="6"
-        className="fill-white/[0.02] stroke-blueprint-line/30" strokeWidth="1.5" />
-      <rect x="30" y="100" width="360" height="40" className="fill-white/[0.03]" />
-      <line x1="35" y1="120" x2="385" y2="120"
-        className="stroke-blueprint-line/20" strokeWidth="1" strokeDasharray="4 4" />
-
-      <line x1="150" y1="20" x2="150" y2="100" className="stroke-blueprint-line/30" strokeWidth="1.5" />
-      <line x1="270" y1="20" x2="270" y2="100" className="stroke-blueprint-line/30" strokeWidth="1.5" />
-      <line x1="150" y1="140" x2="150" y2="220" className="stroke-blueprint-line/30" strokeWidth="1.5" />
-      <line x1="270" y1="140" x2="270" y2="220" className="stroke-blueprint-line/30" strokeWidth="1.5" />
-
-      <rect x="32" y="22" width="116" height="76" rx="2"
-        className="fill-signal/10 stroke-signal/60 motion-safe:animate-pulse" strokeWidth="1.5" />
-      <circle cx="138" cy="32" r="3" className="fill-signal motion-safe:animate-pulse" />
-      <text x="42" y="42" className="fill-signal-light font-mono" fontSize="9" letterSpacing="0.5">A-01</text>
-      <text x="42" y="54" className="fill-blueprint-line/70 font-mono" fontSize="7">Libre</text>
-      <path d="M80,100 A20,20 0 0 1 100,80" className="fill-none stroke-blueprint-line/25" strokeWidth="1" />
-
-      <rect x="272" y="142" width="116" height="76" rx="2"
-        className="fill-signal/10 stroke-signal/60 motion-safe:animate-pulse" strokeWidth="1.5" />
-      <circle cx="378" cy="152" r="3" className="fill-signal motion-safe:animate-pulse" />
-      <text x="282" y="162" className="fill-signal-light font-mono" fontSize="9" letterSpacing="0.5">C-18</text>
-      <text x="282" y="174" className="fill-blueprint-line/70 font-mono" fontSize="7">Libre</text>
-      <path d="M320,140 A20,20 0 0 0 340,160" className="fill-none stroke-blueprint-line/25" strokeWidth="1" />
-
-      <g className="stroke-blueprint-line/30" strokeWidth="1" fill="none">
-        <circle cx="395" cy="40" r="13" />
-        <polygon points="395,29 398,41 392,41" className="fill-blueprint-line/40" />
-      </g>
-      <text x="395" y="14" textAnchor="middle" className="fill-blueprint-line/50 font-mono" fontSize="8">N</text>
-    </svg>
-  )
-}
+/**
+ * Cle localStorage memorisant l'adresse du dernier utilisateur qui a coche
+ * « Se souvenir de moi ». Elle ne contient jamais de mot de passe.
+ */
+const REMEMBERED_EMAIL_KEY = 'campusops.rememberedEmail'
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('')
+  // L'adresse memorisee est pre-remplie : c'est l'effet visible de la case
+  // « Se souvenir de moi » lors du retour sur la page.
+  const rememberedEmail = localStorage.getItem(REMEMBERED_EMAIL_KEY) || ''
+
+  const [email, setEmail] = useState(rememberedEmail)
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const [remember, setRemember] = useState(true)
+  const [remember, setRemember] = useState(Boolean(rememberedEmail))
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -91,18 +66,45 @@ export default function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
-    setIsSubmitting(true)
 
+    // Validation côté client avant tout appel réseau.
+    const trimmedEmail = email.trim()
+    if (!trimmedEmail || !password) {
+      setError('Veuillez saisir votre adresse e-mail et votre mot de passe.')
+      return
+    }
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailPattern.test(trimmedEmail)) {
+      setError('Veuillez saisir une adresse e-mail valide.')
+      return
+    }
+
+    setIsSubmitting(true)
     try {
-      const userData = await login(email, password, remember)
-      navigate(userData.mustChangePassword ? '/change-password' : '/dashboard')
-    } catch (err) {
-      if (err.response?.status === 401) {
-        setError('Identifiants incorrects')
-      } else if (err.response?.status === 403) {
-        setError('Ce compte est desactive')
+      const userData = await login(trimmedEmail, password, remember)
+
+      // Deuxieme effet de la case : on retient (ou on oublie) l'adresse pour
+      // la prochaine visite. Le mot de passe n'est jamais conserve.
+      if (remember) {
+        localStorage.setItem(REMEMBERED_EMAIL_KEY, trimmedEmail)
       } else {
-        setError('Une erreur est survenue, veuillez reessayer')
+        localStorage.removeItem(REMEMBERED_EMAIL_KEY)
+      }
+
+      navigate(userData.mustChangePassword ? '/change-password' : homeRouteForRole(userData.role))
+    } catch (err) {
+      const status = err.response?.status
+      if (status === 401) {
+        setError('Adresse e-mail ou mot de passe incorrect.')
+      } else if (status === 403) {
+        setError('Votre compte est désactivé. Contactez l\'administrateur.')
+      } else if (!err.response) {
+        // Aucune réponse du serveur (serveur arrêté, réseau, CORS...).
+        setError('Impossible de se connecter au serveur. Veuillez réessayer plus tard.')
+      } else if (status >= 500) {
+        setError('Une erreur est survenue côté serveur. Veuillez réessayer plus tard.')
+      } else {
+        setError('La connexion a échoué. Veuillez réessayer.')
       }
     } finally {
       setIsSubmitting(false)
@@ -110,51 +112,11 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row font-body">
-
-      {/* Panneau gauche */}
-      <div className="relative lg:w-1/2 bg-gradient-to-br from-blueprint-800 to-blueprint-900 text-white px-8 py-10 lg:px-16 lg:py-16 flex flex-col justify-between overflow-hidden">
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.07]"
-          style={{
-            backgroundImage:
-              'linear-gradient(var(--color-blueprint-line) 1px, transparent 1px), linear-gradient(90deg, var(--color-blueprint-line) 1px, transparent 1px)',
-            backgroundSize: '32px 32px',
-          }}
-        />
-
-        <div className="relative">
-          <span className="font-mono text-[11px] tracking-[0.2em] text-signal-light uppercase">
-            Systeme de gestion des espaces
-          </span>
-          <h1 className="font-display text-4xl lg:text-5xl font-semibold mt-3 tracking-tight">
-            Campus<span className="text-signal-light">Ops</span>
-          </h1>
-          <p className="text-blueprint-line/80 mt-3 max-w-sm text-sm lg:text-base">
-            Reservez et gerez les salles, amphis et laboratoires de votre etablissement en temps reel.
-          </p>
-        </div>
-
-        <div className="relative flex justify-center py-8">
-          <BlueprintFloorplan />
-        </div>
-
-        <div className="relative flex items-center gap-6 font-mono text-xs text-blueprint-line/70 border-t border-white/10 pt-5">
-          <span><span className="text-signal-light font-medium">18+</span> Bâtiments</span>
-          <span className="w-px h-4 bg-white/10" />
-          <span><span className="text-signal-light font-medium">300+</span> Espaces</span>
-          <span className="w-px h-4 bg-white/10" />
-          <span>Disponibilité en temps réel</span>
-        </div>
-      </div>
-
-      {/* Panneau droit */}
-      <div className="lg:w-1/2 bg-paper flex items-center justify-center px-6 py-12">
-        <div className="w-full max-w-sm">
-          <h2 className="font-display text-3xl font-semibold text-ink">Connexion</h2>
-          <p className="text-ink/60 text-sm mt-2 mb-8">
-            Connectez-vous avec votre identifiant institutionnel.
-          </p>
+    <AuthShell>
+      <h2 className="font-display text-3xl font-semibold text-ink">Connexion</h2>
+      <p className="text-ink/60 text-sm mt-2 mb-8">
+        Connectez-vous avec votre identifiant institutionnel.
+      </p>
 
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             <div>
@@ -171,7 +133,7 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   placeholder="prenom.nom@universite.ma"
-                  className="w-full pl-10 pr-3 py-2.5 border border-ink/15 rounded-lg bg-white text-sm placeholder:text-ink/30 focus:outline-none focus:ring-2 focus:ring-signal focus:border-signal transition-colors"
+                  className="w-full pl-10 pr-3 py-2.5 border border-ink/15 rounded-lg bg-surface text-sm placeholder:text-ink/30 focus:outline-none focus:ring-2 focus:ring-signal focus:border-signal transition-colors"
                 />
               </div>
             </div>
@@ -190,7 +152,7 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   placeholder="********"
-                  className="w-full pl-10 pr-10 py-2.5 border border-ink/15 rounded-lg bg-white text-sm placeholder:text-ink/30 focus:outline-none focus:ring-2 focus:ring-signal focus:border-signal transition-colors"
+                  className="w-full pl-10 pr-10 py-2.5 border border-ink/15 rounded-lg bg-surface text-sm placeholder:text-ink/30 focus:outline-none focus:ring-2 focus:ring-signal focus:border-signal transition-colors"
                 />
                 <button
                   type="button"
@@ -203,16 +165,29 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <div className="flex items-center justify-between text-sm pt-1">
-              <label className="flex items-center gap-2 text-ink/70 select-none">
-                <input
-                  type="checkbox"
-                  checked={remember}
-                  onChange={(e) => setRemember(e.target.checked)}
-                  className="rounded border-ink/25 text-signal focus:ring-signal"
-                />
-                Se souvenir de moi
-              </label>
+            <div className="pt-1">
+              <div className="flex items-center justify-between text-sm">
+                <label className="flex items-center gap-2 text-ink/70 select-none">
+                  <input
+                    type="checkbox"
+                    checked={remember}
+                    onChange={(e) => setRemember(e.target.checked)}
+                    className="rounded border-ink/25 text-signal focus:ring-signal"
+                  />
+                  Se souvenir de moi
+                </label>
+                <Link
+                  to="/forgot-password"
+                  className="font-medium text-signal transition-colors hover:underline"
+                >
+                  Mot de passe oublié ?
+                </Link>
+              </div>
+              <p className="text-xs text-ink/45 mt-1.5 leading-relaxed">
+                {remember
+                  ? 'Votre session et votre adresse e-mail seront conservées sur cet ordinateur.'
+                  : "Votre session sera fermée lorsque vous quitterez le navigateur, et votre adresse ne sera pas mémorisée."}
+              </p>
             </div>
 
             {error && (
@@ -236,21 +211,6 @@ export default function LoginPage() {
               )}
             </button>
           </form>
-
-          <p className="text-xs text-ink/45 text-center mt-6 leading-relaxed">
-            Mot de passe oublié ? Contactez l'administrateur de votre établissement.
-          </p>
-
-          <div className="mt-10 pt-6 border-t border-ink/10 text-center">
-            <p className="text-xs text-ink/40">
-              © 2026 CampusOps · Tous droits réservés
-            </p>
-            <p className="font-mono text-[10px] text-ink/30 mt-1 tracking-wide">
-              Gestion et réservation des espaces pédagogiques
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
+    </AuthShell>
   )
 }

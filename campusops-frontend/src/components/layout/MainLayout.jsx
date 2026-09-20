@@ -1,20 +1,13 @@
-import { useState } from 'react'
-import { Outlet } from 'react-router-dom'
-import Sidebar from './Sidebar'
-import Topbar from './Topbar'
+import { useAuth } from '../../context/AuthContext'
+import { SIMPLE_NAV_ROLES } from '../../constants/roles'
+import AdminLayout from './AdminLayout'
+import UserLayout from './UserLayout'
 
+// Aiguille vers l'interface d'administration (Sidebar + Topbar) ou vers
+// l'interface simplifiee (Navbar + contenu + footer) selon le role connecte.
 export default function MainLayout() {
-  const [mobileOpen, setMobileOpen] = useState(false)
+  const { user } = useAuth()
+  const isSimpleNav = SIMPLE_NAV_ROLES.includes(user?.role)
 
-  return (
-    <div className="min-h-screen flex bg-paper">
-      <Sidebar mobileOpen={mobileOpen} onClose={() => setMobileOpen(false)} />
-      <div className="flex-1 flex flex-col min-w-0">
-        <Topbar onMenuClick={() => setMobileOpen(true)} />
-        <main className="flex-1 p-6 lg:p-8">
-          <Outlet />
-        </main>
-      </div>
-    </div>
-  )
+  return isSimpleNav ? <UserLayout /> : <AdminLayout />
 }

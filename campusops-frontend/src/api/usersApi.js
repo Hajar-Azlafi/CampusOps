@@ -31,6 +31,17 @@ export function reactivateUser(id) {
   return axiosClient.patch(`/users/${id}/reactivate`)
 }
 
+// Aperçu d'impact avant suppression (§ preview) : réservations/séances/emplois du
+// temps rattachés à l'utilisateur. Préférer la désactivation pour préserver
+// l'historique ; la suppression reste possible pour un compte créé par erreur.
+export function getUserDeletionImpact(id) {
+  return axiosClient.get(`/users/${id}/impact-suppression`).then((res) => res.data)
+}
+
+export function deleteUser(id, cascade = false) {
+  return axiosClient.delete(`/users/${id}`, { params: { cascade } })
+}
+
 export function resetUserPassword(id) {
   return axiosClient.post(`/users/${id}/reset-password`).then((res) => res.data)
 }

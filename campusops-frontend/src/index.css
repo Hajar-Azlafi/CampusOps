@@ -1,22 +1,290 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 
+/* ==========================================================================
+   THÈME CLAIR / SOMBRE — source unique de vérité des couleurs.
+
+   Principe : chaque utilitaire Tailwind v4 compile vers `var(--color-x)`.
+   Le mode sombre se limite donc à redéfinir ces variables sous `html.dark`
+   (bloc plus bas) : aucune page, aucun composant n'a de logique de thème.
+
+   Règle à respecter en ajoutant du style :
+     - fond de page              -> bg-paper
+     - carte / modale / champ    -> bg-surface        (jamais bg-white)
+     - texte courant / bordures  -> text-ink, border-ink/15, bg-ink/5 ...
+     - titres                    -> text-heading      (jamais text-blueprint-800)
+     - aplat sombre + texte clair-> bg-inverse, bg-blueprint-800, bg-nav
+     - texte sur aplat coloré    -> text-white        (ne bascule pas, c'est voulu)
+   ========================================================================== */
+
 @theme {
   --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
   --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
 
+  /* Surfaces : fond de page et surfaces posées dessus. */
+  --color-paper: #FAF9F6;
+  --color-surface: #FFFFFF;
+
+  /* Texte, bordures et voiles subtils (utilisés avec une opacité). */
+  --color-ink: #2A3341;
+  --color-heading: #0B1D33;
+  --color-heading-soft: #14304F;
+
+  /* Aplats sombres portant du texte clair. */
+  --color-inverse: #2A3341;
+  --color-nav: #0B1D33;
+  --color-nav-deep: #071422;
+
+  /* Bleu marine institutionnel : boutons primaires, pastilles actives. */
   --color-blueprint-900: #071422;
   --color-blueprint-800: #0B1D33;
   --color-blueprint-700: #14304F;
   --color-blueprint-line: #C7D6E8;
-  --color-paper: #FAF9F6;
-  --color-ink: #2A3341;
+
+  /* Accent d'action. */
   --color-signal: #E3A008;
   --color-signal-light: #F6C453;
+  --color-signal-dark: #92600A;
+
+  /* Aplats de statut portant du texte blanc. */
+  --color-danger: #DC2626;
+  --color-danger-strong: #B91C1C;
+  --color-success: #059669;
+}
+
+/* Variables consommées en JavaScript (SVG des graphiques) ou par du CSS brut :
+   déclarées hors @theme, car Tailwind ne conserve dans :root que les tokens
+   effectivement référencés par une classe utilitaire. */
+:root {
+  color-scheme: light;
+
+  --chart-1: #1e3a5f;
+  --chart-2: #2f6fb0;
+  --chart-3: #10b981;
+  --chart-4: #f59e0b;
+  --chart-5: #8b5cf6;
+  --chart-6: #ef4444;
+  --chart-7: #3b82f6;
+  --chart-8: #0ea5e9;
+  --chart-9: #14b8a6;
+  --chart-10: #ec4899;
+
+  --scrollbar-rest: rgba(42, 51, 65, 0.28);
+  --scrollbar-hover: rgba(42, 51, 65, 0.45);
+  --scrollbar-active: rgba(42, 51, 65, 0.6);
+
+  /* Ombre du bandeau supérieur (en-tête collant de l'espace enseignant). */
+  --shadow-header: rgba(11, 29, 51, 0.04);
+}
+
+/* ==========================================================================
+   MODE SOMBRE — on ne redéfinit que des variables. Les 90 fichiers JSX
+   basculent automatiquement puisqu'ils n'utilisent que ces tokens.
+   `color-scheme: dark` aligne aussi les contrôles natifs (listes déroulantes,
+   sélecteurs de date/heure, autofill, barres de défilement du navigateur).
+   ========================================================================== */
+html.dark {
+  color-scheme: dark;
+
+  /* Surfaces : bleu-nuit désaturé, jamais de noir pur (moins fatigant). */
+  --color-paper: #0B111A;
+  --color-surface: #151D28;
+
+  /* Texte et bordures : l'encre s'inverse, toutes les opacités suivent
+     (text-ink/50, border-ink/15, hover:bg-ink/5 ... restent cohérents).
+     Valeur calée par l'audit de contraste : text-ink/50 sur bg-surface doit
+     rester ≥ 4.5:1 (4.61 ici), car cette opacité porte les libellés et indices
+     de formulaire un peu partout. */
+  --color-ink: #E9EFF6;
+  --color-heading: #F4F8FD;
+  --color-heading-soft: #C3D2E6;
+
+  /* Aplats sombres : remontés pour rester lisibles sur fond sombre. */
+  --color-inverse: #31415A;
+  --color-nav: #0E1620;
+  --color-nav-deep: #080D14;
+
+  /* Boutons primaires / pastilles actives : navy éclairci, texte blanc. */
+  --color-blueprint-900: #080D14;
+  --color-blueprint-800: #24374F;
+  --color-blueprint-700: #2F4765;
+
+  /* Accent : teinte conservée ; seule la variante « texte » s'éclaircit. */
+  --color-signal-dark: #F6C453;
+
+  /* Palettes de statut : les teintes 50/100/200/300 deviennent des fonds
+     sourds, les teintes 600→900 deviennent du texte clair. Le couple
+     « fond -50 + texte -700 + bordure -200 » utilisé partout reste lisible. */
+  --color-red-50: #2A1418;
+  --color-red-100: #3A1A20;
+  --color-red-200: #4C2027;
+  --color-red-300: #663039;
+  --color-red-400: #E2646C;
+  --color-red-500: #F0777D;
+  --color-red-600: #F98A90;
+  --color-red-700: #FCA5AA;
+  --color-red-800: #FDC2C6;
+  --color-red-900: #FEDADD;
+
+  --color-emerald-50: #0E241C;
+  --color-emerald-100: #123024;
+  --color-emerald-200: #1B4232;
+  --color-emerald-300: #2E5B45;
+  --color-emerald-500: #34D399;
+  --color-emerald-600: #3FD69A;
+  --color-emerald-700: #6EE7B7;
+  --color-emerald-800: #A7F3D0;
+  --color-emerald-900: #D1FAE5;
+
+  --color-amber-50: #2A1F0B;
+  --color-amber-100: #3A2B0E;
+  --color-amber-200: #4C3813;
+  --color-amber-600: #FBBF24;
+  --color-amber-700: #FCD34D;
+  --color-amber-800: #FDE68A;
+  --color-amber-900: #FEF3C7;
+
+  --color-blue-50: #0E1C2E;
+  --color-blue-100: #13263D;
+  --color-blue-200: #1C3552;
+  --color-blue-600: #60A5FA;
+  --color-blue-700: #93C5FD;
+  --color-blue-800: #BFDBFE;
+
+  --color-purple-50: #1D1630;
+  --color-purple-200: #33254F;
+  --color-purple-700: #C4B5FD;
+
+  /* Graphiques : mêmes teintes, luminosité relevée pour un fond sombre. */
+  --chart-1: #7BA7D6;
+  --chart-2: #5B9BD8;
+  --chart-3: #34D399;
+  --chart-4: #FBBF24;
+  --chart-5: #A78BFA;
+  --chart-6: #F87171;
+  --chart-7: #60A5FA;
+  --chart-8: #38BDF8;
+  --chart-9: #2DD4BF;
+  --chart-10: #F472B6;
+
+  --scrollbar-rest: rgba(233, 239, 246, 0.22);
+  --scrollbar-hover: rgba(233, 239, 246, 0.38);
+  --scrollbar-active: rgba(233, 239, 246, 0.55);
+
+  /* Sur fond sombre, une ombre bleutée à 4 % ne se verrait pas : on l'assombrit
+     pour que l'en-tête collant se détache toujours du contenu qui défile. */
+  --shadow-header: rgba(0, 0, 0, 0.45);
 }
 
 body {
   font-family: var(--font-body);
   color: var(--color-ink);
+  background-color: var(--color-paper);
+}
+
+/* Fondu appliqué uniquement pendant la bascule de thème (classe posée ~250 ms
+   par le ThemeProvider) : évite d'alourdir toutes les autres interactions. */
+html.theme-switching *,
+html.theme-switching *::before,
+html.theme-switching *::after {
+  transition:
+    background-color 200ms ease,
+    border-color 200ms ease,
+    color 200ms ease,
+    fill 200ms ease,
+    stroke 200ms ease !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.theme-switching *,
+  html.theme-switching *::before,
+  html.theme-switching *::after {
+    transition: none !important;
+  }
+}
+
+/* ==========================================================================
+   Scrollbars modernes, centralisées pour toute l'application.
+   Objectif : fines et discrètes au repos, plus visibles au survol du conteneur,
+   plus larges/contrastées pendant la manipulation. S'appliquent partout
+   (sidebar, pages longues, listes, tableaux, modales, zones scrollables).
+   Les teintes viennent de --scrollbar-* : elles s'inversent en mode sombre.
+   ========================================================================== */
+
+/* Firefox : barre fine + couleur discrète (transparente au repos). */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+/* Firefox : la barre apparaît quand on survole un conteneur scrollable. */
+*:hover {
+  scrollbar-color: var(--scrollbar-rest) transparent;
+}
+
+/* WebKit / Chromium / Safari */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Le thumb est rendu "fin" grâce à une bordure transparente (background-clip).
+   Transparent au repos pour rester discret. */
+::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border: 3px solid transparent;
+  border-radius: 9999px;
+  background-clip: padding-box;
+  transition: background-color 0.2s ease, border-width 0.2s ease;
+}
+
+/* Visible lorsqu'on survole le conteneur scrollable. */
+*:hover::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-rest);
+}
+
+/* Plus contrasté au survol direct du thumb. */
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-hover);
+}
+
+/* Plus large et plus visible pendant la manipulation (clic/drag). */
+::-webkit-scrollbar-thumb:active {
+  background-color: var(--scrollbar-active);
+  border-width: 2px;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Variante claire pour les fonds sombres (sidebar bleu marine, panneau de
+   connexion) : reste identique dans les deux thèmes, ces zones étant sombres
+   en mode clair comme en mode sombre. */
+.scroll-on-dark {
+  scrollbar-color: transparent transparent;
+}
+.scroll-on-dark:hover {
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+.scroll-on-dark:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.28);
+}
+.scroll-on-dark::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.45);
+}
+.scroll-on-dark::-webkit-scrollbar-thumb:active {
+  background-color: rgba(255, 255, 255, 0.6);
+}
+
+/* Utilitaire pour les tableaux à défilement horizontal : barre fine et discrète
+   qui ne déforme pas la mise en page. */
+.table-scroll-x {
+  overflow-x: auto;
+  overflow-y: hidden;
 }

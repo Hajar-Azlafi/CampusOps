@@ -19,7 +19,7 @@ function PasswordField({ id, label, value, onChange, show, onToggleShow, autoCom
           value={value}
           onChange={onChange}
           required
-          className="w-full pl-10 pr-10 py-2.5 border border-ink/15 rounded-lg bg-white text-sm placeholder:text-ink/30 focus:outline-none focus:ring-2 focus:ring-signal focus:border-signal transition-colors"
+          className="w-full pl-10 pr-10 py-2.5 border border-ink/15 rounded-lg bg-surface text-sm placeholder:text-ink/30 focus:outline-none focus:ring-2 focus:ring-signal focus:border-signal transition-colors"
         />
         <button
           type="button"
@@ -63,14 +63,20 @@ export default function ChangePasswordPage() {
 
     setIsSubmitting(true)
     try {
-      await axiosClient.put('/auth/change-password', { oldPassword, newPassword })
+      // Le backend revalide la correspondance des deux saisies : les trois
+      // champs doivent donc etre transmis.
+      await axiosClient.put('/auth/change-password', {
+        oldPassword,
+        newPassword,
+        confirmPassword,
+      })
       markPasswordChanged()
       navigate('/dashboard')
     } catch (err) {
       if (err.response?.status === 401) {
         setError("L'ancien mot de passe est incorrect")
       } else {
-        setError('Une erreur est survenue, veuillez reessayer')
+        setError('Une erreur est survenue, veuillez réessayer')
       }
     } finally {
       setIsSubmitting(false)
@@ -81,7 +87,7 @@ export default function ChangePasswordPage() {
     <div className="max-w-md">
       {isForced && (
         <div className="mb-6 bg-signal/10 border border-signal/30 rounded-lg px-4 py-3">
-          <p className="text-sm text-blueprint-800 font-medium">
+          <p className="text-sm text-heading font-medium">
             Vous devez changer votre mot de passe temporaire avant de continuer.
           </p>
         </div>
@@ -137,7 +143,7 @@ export default function ChangePasswordPage() {
           {isSubmitting ? (
             <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
           ) : (
-            'Mettre a jour le mot de passe'
+            'Mettre à jour le mot de passe'
           )}
         </button>
       </form>

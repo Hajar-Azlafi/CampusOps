@@ -2,6 +2,7 @@ package com.campusops.user.dto;
 
 import com.campusops.enums.Role;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,7 +35,16 @@ public class UserResponseDto {
     @JsonProperty("isActive")
     private boolean isActive;
 
+    /**
+     * Indique si l'e-mail d'identifiants a bien ete envoye lors de la creation.
+     * Champ non sensible (aucun mot de passe). Present uniquement dans la reponse
+     * de creation ({@code true}/{@code false}), omis ailleurs.
+     */
     @com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
+    private Boolean emailSent;
+
+    /** Mot de passe temporaire, renseigne uniquement lors d'une creation. */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String temporaryPassword;
 
     private LocalDateTime createdAt;

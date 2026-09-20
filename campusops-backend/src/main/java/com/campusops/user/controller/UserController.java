@@ -37,9 +37,10 @@ public class UserController {
     @GetMapping
     public ResponseEntity<List<UserResponseDto>> getUsers(
             @RequestParam(required = false) Role role,
-            @RequestParam(required = false) String department
+            @RequestParam(required = false) String department,
+            @RequestParam(required = false) Boolean actif
     ) {
-        return ResponseEntity.ok(userService.filterUsers(role, department));
+        return ResponseEntity.ok(userService.filterUsers(role, department, actif));
     }
 
     @GetMapping("/search")
@@ -71,9 +72,33 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Analyse d'impact avant suppression (§ preview) : usages metier qui
+     * bloquent la suppression du compte (reservations, responsabilite de
+     * filiere). Alimente la modale de confirmation. Pour un compte porteur
+     * d'historique, la desactivation reste preferable a la suppression.
+     */
+    @GetMapping("/{id}/impact-suppression")
+    public ResponseEntity<com.campusops.deletion.DeletionImpact> deletionImpact(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.getDeletionImpact(id));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "false") boolean cascade) {
+        userService.deleteUser(id, cascade);
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping("/{id}/reset-password")
     public ResponseEntity<PasswordResetResponseDto> resetPassword(@PathVariable Long id) {
         return ResponseEntity.ok(userService.resetPassword(id));
+    }
+
+    @PostMapping("/{id}/resend-credentials")
+    public ResponseEntity<PasswordResetResponseDto> resendCredentials(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.resendCredentials(id));
     }
 
     @PostMapping(value = "/import", consumes = "multipart/form-data")

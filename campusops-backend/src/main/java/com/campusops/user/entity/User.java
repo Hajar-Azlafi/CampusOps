@@ -68,6 +68,38 @@ public class User implements UserDetails {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    // ----- Securite de la connexion (Module 11, §7) -----
+
+    /**
+     * Nombre d'echecs de connexion consecutifs. Remis a zero a chaque connexion
+     * reussie et a chaque changement de mot de passe.
+     *
+     * <p><b>Migration non destructive</b> : colonne <b>nullable</b> ajoutee via
+     * {@code ddl-auto=update} ; les comptes existants valent NULL, traite comme
+     * zero par le service de securite de connexion.</p>
+     */
+    @Column(name = "failed_login_attempts")
+    @Builder.Default
+    private Integer failedLoginAttempts = 0;
+
+    /**
+     * Date/heure jusqu'a laquelle le compte est verrouille apres trop d'echecs
+     * (parametre « durée de verrouillage »). {@code null} = compte non verrouille.
+     * Colonne nullable (migration non destructive).
+     */
+    @Column(name = "locked_until")
+    private LocalDateTime lockedUntil;
+
+    /**
+     * Date du dernier mot de passe <b>choisi par l'utilisateur</b> : reference du
+     * calcul d'expiration (parametre « durée de validité du mot de passe »).
+     * {@code null} pour les comptes anterieurs a cette colonne : la date de
+     * creation sert alors de reference. Colonne nullable (migration non
+     * destructive).
+     */
+    @Column(name = "password_changed_at")
+    private LocalDateTime passwordChangedAt;
+
     // ----- Implementation UserDetails (Spring Security) -----
 
     @Override
@@ -85,9 +117,14 @@ public class User implements UserDetails {
         return true;
     }
 
+    /**
+     * Verrouillage temporaire du compte apres trop d'echecs de connexion (§7).
+     * Spring Security s'appuie sur cette methode : un compte verrouille ne peut
+     * pas s'authentifier, meme avec le bon mot de passe, jusqu'a l'echeance.
+     */
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return lockedUntil == null || !lockedUntil.isAfter(LocalDateTime.now());
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.campusops.security;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -35,7 +36,29 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/login").permitAll()
+                        .requestMatchers(
+                                "/api/auth/login",
+                                "/api/auth/forgot-password",
+                                "/api/auth/reset-password"
+                        ).permitAll()
+                        // Identite visuelle de l'universite (Module 11, §11/§16) : la page
+                        // de connexion doit afficher le nom, le logo et les couleurs AVANT
+                        // qu'un jeton existe. Restreint a GET et a ces trois chemins : les
+                        // POST/DELETE sur /logo et /favicon restent authentifies puis
+                        // verifies ADMIN dans SettingsMediaService.
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/settings/branding",
+                                "/api/settings/logo",
+                                "/api/settings/favicon"
+                        ).permitAll()
+                        // Tout le reste de /api/settings est reserve a l'ADMIN (§14).
+                        // Deuxieme barriere volontaire : l'autorisation reelle reste
+                        // portee par accessScope.requireAdmin() dans SettingsService et
+                        // SettingsMediaService (convention du projet, cf. AccessScopeService),
+                        // mais cette regle arrete la requete des le filtre, avant meme
+                        // d'atteindre le controleur. Les trois GET publics ci-dessus sont
+                        // declares avant, donc ils continuent de passer.
+                        .requestMatchers("/api/settings", "/api/settings/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
