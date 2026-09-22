@@ -1,1 +1,21 @@
 .vscode/
+
+# IDEs and local project metadata
+.idea/
+
+# Build and dependency outputs
+target/
+node_modules/
+dist/
+
+# Local environment and secret files
+.env
+.env.*
+!.env.example
+secrets.properties
+
+# Logs and temporary files
+logs/
+*.log
+*.tmp
+*.swp

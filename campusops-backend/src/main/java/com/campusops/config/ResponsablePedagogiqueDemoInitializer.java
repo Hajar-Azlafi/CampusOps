@@ -54,7 +54,7 @@ public class ResponsablePedagogiqueDemoInitializer implements CommandLineRunner 
     @Value("${campusops.seed.responsables:false}")
     private boolean enabled;
 
-    @Value("${campusops.seed.responsables-password:Responsable@123}")
+    @Value("${campusops.seed.responsables-password}")
     private String demoPassword;
 
     /**

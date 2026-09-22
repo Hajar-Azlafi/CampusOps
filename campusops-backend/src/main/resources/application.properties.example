@@ -1,6 +1,6 @@
 # Application
 spring.application.name=campusops-backend
-server.port=8080
+server.port=${SERVER_PORT:8080}
 
 # ===== Fuseau horaire de l'application =====
 # Fuseau de reference du processus (taches planifiees + serialisation des dates).
@@ -10,9 +10,9 @@ campusops.app.timezone=${CAMPUSOPS_APP_TIMEZONE:Africa/Casablanca}
 spring.jackson.time-zone=${campusops.app.timezone:Africa/Casablanca}
 
 # PostgreSQL
-spring.datasource.url=jdbc:postgresql://localhost:5434/campusops_db
-spring.datasource.username=postgres
-spring.datasource.password=CHANGE_MOI
+spring.datasource.url=${DB_URL:jdbc:postgresql://localhost:5434/campusops_db}
+spring.datasource.username=${DB_USERNAME:postgres}
+spring.datasource.password=${DB_PASSWORD}
 spring.datasource.driver-class-name=org.postgresql.Driver
 
 # JPA / Hibernate
@@ -21,7 +21,7 @@ spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.format_sql=true
 
 # JWT
-application.security.jwt.secret-key=CHANGE_MOI_CLE_BASE64_256_BITS_MINIMUM
+application.security.jwt.secret-key=${JWT_SECRET}
 application.security.jwt.expiration=86400000
 
 # Encodage
@@ -29,7 +29,7 @@ spring.datasource.hikari.connection-init-sql=SET client_encoding TO 'UTF8'
 
 # Admin par defaut
 application.security.admin.email=admin@campusops.ma
-application.security.admin.default-password=CHANGE_MOI
+application.security.admin.default-password=${ADMIN_DEFAULT_PASSWORD}
 
 # ===== Configuration SMTP (envoi d'e-mails) =====
 # Ne JAMAIS ecrire les identifiants reels ici. Deux moyens de les fournir :
@@ -60,3 +60,5 @@ campusops.mail.enabled=${MAIL_ENABLED:true}
 campusops.mail.reset-token-expiration-minutes=${MAIL_RESET_TOKEN_MINUTES:30}
 campusops.app.login-url=${APP_LOGIN_URL:http://localhost:5173/login}
 campusops.app.reset-password-url=${APP_RESET_URL:http://localhost:5173/reset-password}
+campusops.cors.allowed-origins=${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173}
+campusops.seed.responsables-password=${RESPONSABLES_PASSWORD}

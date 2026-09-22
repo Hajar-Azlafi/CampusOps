@@ -1,0 +1,11 @@
+.git
+.gitignore
+.idea
+.vscode
+target
+logs
+*.log
+*.tmp
+secrets.properties
+application.properties
+*.iml

@@ -38,8 +38,8 @@ import java.util.Locale;
  * ne voit et n'importe que les données de la (des) filière(s) qu'il pilote.
  *
  * <p>Désactivable via {@code campusops.seed.responsables-per-filiere=false}. Mot de
- * passe initial partagé via {@code campusops.seed.responsables-password}
- * (défaut {@code Responsable@123}), commun avec les responsables de démonstration.
+ * passe initial partagé via {@code campusops.seed.responsables-password}, commun
+ * avec les responsables de démonstration.
  */
 @Component
 @Order(11)
@@ -56,7 +56,7 @@ public class ResponsablePedagogiquePerFiliereInitializer implements CommandLineR
     private boolean enabled;
 
     /** Mot de passe initial commun (partagé avec les responsables de démonstration). */
-    @Value("${campusops.seed.responsables-password:Responsable@123}")
+    @Value("${campusops.seed.responsables-password}")
     private String demoPassword;
 
     @Override
