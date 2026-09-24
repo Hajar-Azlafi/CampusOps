@@ -16,6 +16,8 @@ secrets.properties
 
 # Logs and temporary files
 logs/
+backups/
+test-output.txt
 *.log
 *.tmp
 *.swp

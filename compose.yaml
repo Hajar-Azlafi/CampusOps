@@ -1,0 +1,74 @@
+services:
+  db:
+    image: postgres:16
+    container_name: campusops-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-campusops_db}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD doit etre defini dans .env}
+    ports:
+      - "5434:5432"
+    volumes:
+      - campusops_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - campusops-network
+
+  backend:
+    build:
+      context: ./campusops-backend
+      dockerfile: Dockerfile
+    image: campusops-backend:local
+    container_name: campusops-backend
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-campusops_db}
+      DB_USERNAME: ${POSTGRES_USER:-postgres}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD doit etre defini dans .env}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET doit etre defini dans .env}
+      ADMIN_DEFAULT_PASSWORD: ${ADMIN_DEFAULT_PASSWORD:?ADMIN_DEFAULT_PASSWORD doit etre defini dans .env}
+      RESPONSABLES_PASSWORD: ${RESPONSABLES_PASSWORD:?RESPONSABLES_PASSWORD doit etre defini dans .env}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:5173}
+      MAIL_HOST: ${MAIL_HOST:-smtp.gmail.com}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      MAIL_FROM: ${MAIL_FROM:-}
+      MAIL_SMTP_AUTH: ${MAIL_SMTP_AUTH:-true}
+      MAIL_SMTP_STARTTLS: ${MAIL_SMTP_STARTTLS:-true}
+      MAIL_ENABLED: ${MAIL_ENABLED:-false}
+      MAIL_RESET_TOKEN_MINUTES: ${MAIL_RESET_TOKEN_MINUTES:-30}
+      APP_LOGIN_URL: ${APP_LOGIN_URL:-http://localhost:5173/login}
+      APP_RESET_URL: ${APP_RESET_URL:-http://localhost:5173/reset-password}
+      SERVER_PORT: 8080
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - campusops-network
+
+  frontend:
+    build:
+      context: ./campusops-frontend
+      dockerfile: Dockerfile
+    image: campusops-frontend:local
+    container_name: campusops-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    networks:
+      - campusops-network
+
+volumes:
+  campusops_pgdata:
+    name: campusops_pgdata
+
+networks:
+  campusops-network:
+    name: campusops-network

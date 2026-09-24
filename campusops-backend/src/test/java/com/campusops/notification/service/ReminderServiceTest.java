@@ -66,8 +66,8 @@ class ReminderServiceTest {
     @Test
     void shouldSendReminderForApprovedReservationOnce() {
 
-        // ReminderService recherche les réservations à J+2
-        LocalDate targetDate = LocalDate.now().plusDays(2);
+        // ReminderService recherche les réservations à J+1 pour un rappel quotidien.
+        LocalDate targetDate = LocalDate.now().plusDays(1);
 
         User user = new User();
         user.setId(12L);
@@ -112,8 +112,8 @@ class ReminderServiceTest {
     @Test
     void shouldSkipDuplicateReminderForSameReservation() {
 
-        // ReminderService recherche les réservations à J+2
-        LocalDate targetDate = LocalDate.now().plusDays(2);
+        // ReminderService recherche les réservations à J+1 pour un rappel quotidien.
+        LocalDate targetDate = LocalDate.now().plusDays(1);
 
         User user = new User();
         user.setId(12L);

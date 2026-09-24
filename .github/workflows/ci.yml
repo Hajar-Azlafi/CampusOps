@@ -1,0 +1,103 @@
+name: CampusOps CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  backend-tests:
+    name: Backend tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: campusops_ci
+          POSTGRES_USER: campusops_ci
+          POSTGRES_PASSWORD: campusops_ci_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U campusops_ci -d campusops_ci"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DB_URL: jdbc:postgresql://localhost:5432/campusops_ci
+      DB_USERNAME: campusops_ci
+      DB_PASSWORD: campusops_ci_password
+      JWT_SECRET: ci-test-jwt-secret-for-github-actions
+      ADMIN_DEFAULT_PASSWORD: CIAdminPass123!
+      RESPONSABLES_PASSWORD: CIResponsablePass123!
+      CORS_ALLOWED_ORIGINS: http://localhost:5173
+      MAIL_ENABLED: "false"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Run backend tests
+        working-directory: campusops-backend
+        run: |
+          chmod +x mvnw
+          ./mvnw --batch-mode test
+
+  frontend-build:
+    name: Frontend build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: campusops-frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: campusops-frontend
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: campusops-frontend
+        run: npm run build
+
+  docker-validation:
+    name: Docker Compose validation
+    runs-on: ubuntu-latest
+    env:
+      POSTGRES_DB: campusops_ci
+      POSTGRES_USER: campusops_ci
+      POSTGRES_PASSWORD: campusops_ci_password
+      JWT_SECRET: ci-test-jwt-secret-for-github-actions
+      ADMIN_DEFAULT_PASSWORD: CIAdminPass123!
+      RESPONSABLES_PASSWORD: CIResponsablePass123!
+      CORS_ALLOWED_ORIGINS: http://localhost:5173
+      MAIL_ENABLED: "false"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Validate Docker Compose
+        run: docker compose config
+
+      - name: Build Docker images
+        run: docker compose build backend frontend

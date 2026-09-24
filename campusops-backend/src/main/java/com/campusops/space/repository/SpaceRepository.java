@@ -3,6 +3,7 @@ package com.campusops.space.repository;
 import com.campusops.enums.SpaceType;
 import com.campusops.space.entity.Space;
 import jakarta.persistence.LockModeType;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
@@ -14,6 +15,10 @@ import java.util.Optional;
 
 @Repository
 public interface SpaceRepository extends JpaRepository<Space, Long> {
+
+        @EntityGraph(attributePaths = "equipments")
+        @Query("SELECT s FROM Space s")
+        List<Space> findAllWithEquipments();
 
     List<Space> findByFloorId(Long floorId);
 

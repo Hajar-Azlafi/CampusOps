@@ -98,8 +98,9 @@ public class ReferenceDataResetInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) {
         boolean alreadySeeded = programRepository.existsByCode(SIGNATURE_CODE);
-        if (alreadySeeded && !resetEnabled) {
-            // Petit référentiel de démonstration déjà construit : on n'efface rien.
+                if (!resetEnabled) {
+                        // La reconstruction est strictement opt-in : un référentiel partiel
+                        // ou ancien ne doit jamais entraîner la suppression de données.
             return;
         }
 
@@ -350,10 +351,9 @@ public class ReferenceDataResetInitializer implements CommandLineRunner {
     }
 
     /**
-     * Supprime l'ancienne contrainte d'unicité mono-colonne sur {@code programs.nom}
-     * ainsi que la colonne obsolète {@code programs.actif} : Hibernate en mode
-     * {@code update} ne les retire pas et elles feraient échouer la reconstruction
-     * (une même filière — nom — peut exister dans plusieurs cycles).
+     * Supprime l'ancienne contrainte d'unicité mono-colonne sur {@code programs.nom}.
+     * Hibernate en mode {@code update} ne la retire pas et elle ferait échouer la
+     * reconstruction (une même filière — nom — peut exister dans plusieurs cycles).
      */
     private void dropLegacyNomUniqueConstraint() {
         try {
@@ -382,11 +382,6 @@ public class ReferenceDataResetInitializer implements CommandLineRunner {
             } catch (Exception e) {
                 log.debug("[reset-reference-data] Contrainte {} non supprimée : {}", constraint, e.getMessage());
             }
-        }
-        try {
-            jdbcTemplate.execute("ALTER TABLE programs DROP COLUMN IF EXISTS actif");
-        } catch (Exception e) {
-            log.debug("[reset-reference-data] Colonne programs.actif non supprimée : {}", e.getMessage());
         }
     }
 }

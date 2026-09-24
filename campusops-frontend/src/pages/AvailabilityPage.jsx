@@ -788,9 +788,6 @@ export default function AvailabilityPage() {
             {meta?.libelleDate && (
               <p className="mt-0.5 text-ink/45">
                 Journée analysée : <span className="font-medium text-heading/80">{meta.libelleDate}</span>
-                {searchWindow?.heureLimiteRecherche
-                  ? ` · recherches du jour closes à ${searchWindow.heureLimiteRecherche}`
-                  : ''}
               </p>
             )}
           </div>
@@ -1135,6 +1132,7 @@ export default function AvailabilityPage() {
         open={reservationModal.open}
         mode="create"
         isAdmin={isAdmin}
+        currentUser={user}
         users={users}
         pedagogical={isRp}
         programs={programs}

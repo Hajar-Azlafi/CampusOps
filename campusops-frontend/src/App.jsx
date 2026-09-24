@@ -52,6 +52,7 @@ import MesModulesPage from './pages/MesModulesPage'
 import ResponsablesPage from './pages/ResponsablesPage'
 // Parametres et configuration de l'universite (Module 11), reserve a l'ADMIN.
 import SettingsPage from './pages/SettingsPage'
+import NotFoundPage from './pages/NotFoundPage'
 
 // Roles habilites a utiliser les modules d'administration / infrastructure /
 // academique (memes roles que ceux affiches dans la Sidebar existante).
@@ -63,9 +64,17 @@ function Placeholder({ title }) {
 
 // Redirige vers la page d'accueil adaptee au role de l'utilisateur connecte.
 function HomeRedirect() {
-  const { user, loading } = useAuth()
+  const { user, isAuthenticated, loading } = useAuth()
   if (loading) return null
+  if (!isAuthenticated) return <Navigate to="/login" replace />
   return <Navigate to={homeRouteForRole(user?.role)} replace />
+}
+
+function RouteFallback() {
+  const { isAuthenticated, loading } = useAuth()
+  if (loading) return null
+  if (!isAuthenticated) return <Navigate to="/login" replace />
+  return <NotFoundPage />
 }
 
 // "/reservations" pointe vers deux experiences differentes selon le role :
@@ -432,6 +441,7 @@ function App() {
 
             <Route path="/change-password" element={<ChangePasswordPage />} />
           </Route>
+          <Route path="*" element={<RouteFallback />} />
         </Routes>
         </BrowserRouter>
         </AcademicYearProvider>

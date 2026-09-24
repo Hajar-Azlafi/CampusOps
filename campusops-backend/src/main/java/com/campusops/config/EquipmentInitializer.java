@@ -120,7 +120,7 @@ public class EquipmentInitializer implements CommandLineRunner {
     }
 
     private void associateEquipmentsToSpaces(Map<String, Equipment> catalog) {
-        List<Space> spaces = spaceRepository.findAll();
+                List<Space> spaces = spaceRepository.findAllWithEquipments();
         if (spaces.isEmpty()) {
             log.info("Aucun espace disponible, association des equipements ignoree.");
             return;

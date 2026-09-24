@@ -72,6 +72,7 @@ export default function ReservationFormModal({
   // Lorsque `isAdmin` est vrai et que `users` est fourni, l'administrateur peut
   // choisir le bénéficiaire de la réservation.
   isAdmin = false,
+  currentUser = null,
   users = [],
   // Contexte pédagogique : lorsque `pedagogical` est vrai (demande d'un
   // responsable pédagogique), la filière concernée est obligatoire et le groupe
@@ -136,6 +137,14 @@ export default function ReservationFormModal({
   const scopedGroups = form.programId
     ? groups.filter((g) => String(g.programId) === String(form.programId))
     : []
+
+  const userDisplayName = (user) => {
+    const name = [user?.firstName, user?.lastName, user?.prenom, user?.nom]
+      .filter(Boolean)
+      .join(' ')
+      .trim()
+    return name || user?.email || 'Utilisateur sans nom'
+  }
 
   // §5 — Bornes reservables EFFECTIVES : la periode libre retenue prime sur la
   // fenetre globale transmise par la recherche. L'utilisateur peut prendre une
@@ -553,10 +562,12 @@ export default function ReservationFormModal({
                 onChange={handleChange('targetUserId')}
                 className={inputClass}
               >
-                <option value="">Moi-même (administrateur)</option>
+                <option value="">
+                  {userDisplayName(currentUser)} — {roleLabel(currentUser?.role || 'ADMIN')}
+                </option>
                 {users.map((u) => (
                   <option key={u.id} value={u.id}>
-                    {u.nomComplet ?? `${u.prenom ?? ''} ${u.nom ?? ''}`.trim()}
+                    {userDisplayName(u)}
                     {u.role ? ` — ${roleLabel(u.role)}` : ''}
                   </option>
                 ))}
