@@ -32,7 +32,7 @@ public class SecurityConfig {
     private final MustChangePasswordFilter mustChangePasswordFilter;
     private final CustomUserDetailsService userDetailsService;
 
-    @Value("${campusops.cors.allowed-origins}")
+    @Value("${campusops.cors.allowed-origins:http://localhost:3000,http://localhost:5173}")
     private String allowedOrigins;
 
     @Bean

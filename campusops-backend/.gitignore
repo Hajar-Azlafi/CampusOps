@@ -18,7 +18,9 @@ target/
 *.iws
 *.iml
 *.ipr
-src/main/resources/application.properties
+# NOTE : application.properties EST maintenant versionne (sans secrets).
+# Les valeurs sensibles sont injectees via variables d'environnement.
+# Seul secrets.properties reste ignore (voir ci-dessous).
 
 ### NetBeans ###
 /nbproject/private/
