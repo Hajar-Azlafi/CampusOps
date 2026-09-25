@@ -21,6 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -66,8 +67,8 @@ class ReminderServiceTest {
     @Test
     void shouldSendReminderForApprovedReservationOnce() {
 
-        // ReminderService recherche les réservations à J+1 pour un rappel quotidien.
-        LocalDate targetDate = LocalDate.now().plusDays(1);
+        // ReminderService recherche les réservations à J+1 selon le fuseau configuré.
+        LocalDate targetDate = LocalDate.now(ZoneId.of(settings.getFuseauHoraire())).plusDays(1);
 
         User user = new User();
         user.setId(12L);
@@ -112,8 +113,8 @@ class ReminderServiceTest {
     @Test
     void shouldSkipDuplicateReminderForSameReservation() {
 
-        // ReminderService recherche les réservations à J+1 pour un rappel quotidien.
-        LocalDate targetDate = LocalDate.now().plusDays(1);
+        // ReminderService recherche les réservations à J+1 selon le fuseau configuré.
+        LocalDate targetDate = LocalDate.now(ZoneId.of(settings.getFuseauHoraire())).plusDays(1);
 
         User user = new User();
         user.setId(12L);

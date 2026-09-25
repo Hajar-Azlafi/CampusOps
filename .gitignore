@@ -13,6 +13,8 @@ dist/
 .env.*
 !.env.example
 secrets.properties
+src/test/resources/application-test.properties
+src/test/resources/application-test.properties.example
 
 # Logs and temporary files
 logs/

@@ -65,7 +65,7 @@ public class SettingsMedia {
     private Long tailleOctets;
 
     @Lob
-    @Column(name = "data", nullable = false)
+    @Column(name = "data", nullable = false, columnDefinition = "BYTEA")
     private byte[] data;
 
     @UpdateTimestamp
